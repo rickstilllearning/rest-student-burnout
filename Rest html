@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REST Platform - Real-Time Evaluation for Student Stress Tracking</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #334155;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 650px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+        h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95em;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #475569;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.05em;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .result-card {
+            margin-top: 30px;
+            padding: 22px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            border-left: 6px solid var(--secondary);
+            display: none;
+        }
+        .score-display {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        .status-display {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .rec-text {
+            font-style: italic;
+            color: #475569;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>REST (Real-Time Evaluation for Student Stress Tracking)</h2>
+        <div class="subtitle">Platform Analitik Beban Akademik & Non-Akademik — SMA Negeri 1 Kepanjen</div>
+        
+        <div class="form-group">
+            <label for="tugas">Jumlah Tugas / Tenggat Aktif Hari Ini:</label>
+            <input type="number" id="tugas" min="0" value="3" placeholder="Contoh: 3">
+        </div>
+        
+        <div class="form-group">
+            <label for="jam_belajar">Durasi Belajar & Ekstrakurikuler (Jam):</label>
+            <input type="number" id="jam_belajar" min="0" step="0.5" value="6" placeholder="Contoh: 6">
+        </div>
+        
+        <div class="form-group">
+            <label for="istirahat">Waktu Istirahat & Tidur Berkualitas (Jam):</label>
+            <input type="number" id="istirahat" min="0" step="0.5" value="7" placeholder="Contoh: 7">
+        </div>
+        
+        <button onclick="evaluateStress()">Evaluasi Status Stres & Burnout</button>
+
+        <div class="result-card" id="resultCard">
+            <div class="score-display" id="scoreText">Indeks Beban: -</div>
+            <div class="status-display" id="statusText">Status: -</div>
+            <div class="rec-text" id="recText">Rekomendasi pencegahan akan muncul di sini.</div>
+        </div>
+    </div>
+
+    <script>
+        function evaluateStress() {
+            const tugas = parseFloat(document.getElementById('tugas').value) || 0;
+            const jam_belajar = parseFloat(document.getElementById('jam_belajar').value) || 0;
+            const istirahat = parseFloat(document.getElementById('istirahat').value) || 0;
+
+            // Algoritma Evaluasi Indeks Burnout
+            let raw_score = (tugas * 6) + (jam_belajar * 3.5) - (istirahat * 5);
+            let score = Math.max(10, Math.min(100, raw_score + 20));
+            score = Math.round(score * 10) / 10;
+
+            let status = "";
+            let recommendation = "";
+
+            if (score > 75) {
+                status = "Risiko Burnout Tinggi 🔴";
+                recommendation = "Segera ambil jeda istirahat (teknik Pomodoro 25/5), lakukan relaksasi pernapasan, dan konsultasikan beban tugas dengan guru BK atau wali kelas di SMA Negeri 1 Kepanjen.";
+            } else if (score > 45) {
+                status = "Waspada Stres Sedang 🟡";
+                recommendation = "Atur ulang prioritas tugas harian, pastikan tidur malam minimal 7-8 jam, dan kurangi kegiatan non-esensial untuk sementara waktu.";
+            } else {
+                status = "Kondisi Optimal & Seimbang 🟢";
+                recommendation = "Beban belajar terkontrol dengan baik. Pertahankan konsistensi waktu istirahat dan manajemen waktu harian Anda!";
+            }
+
+            // Tampilkan hasil ke antarmuka
+            const resultCard = document.getElementById('resultCard');
+            resultCard.style.display = 'block';
+            document.getElementById('scoreText').innerText = `Indeks Burnout: ${score} / 100`;
+            document.getElementById('statusText').innerHTML = `Status: ${status}`;
+            document.getElementById('recText').innerText = `💡 Rekomendasi: "${recommendation}"`;
+        }
+    </script>
+</body>
+</html>
